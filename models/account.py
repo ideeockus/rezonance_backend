@@ -27,7 +27,7 @@ class Contacts(BaseModel):
     instagram: str
 
 
-class Person(BaseModel):
+class Account(BaseModel):
     id: int
     username: str
     service_data: ServiceData

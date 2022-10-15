@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class ServiceData(BaseModel):
+class UserData(BaseModel):
     location: str  # ? city ?
     lang: str  # enum ?
     profession: str
@@ -11,6 +11,7 @@ class ServiceData(BaseModel):
     education: str
     interests: str
     life_targets: str
+    hobby: str
     music: str
     sport: str
     worldview: str
@@ -30,5 +31,5 @@ class Contacts(BaseModel):
 class Account(BaseModel):
     id: int
     username: str
-    service_data: ServiceData
+    user_data: UserData
     contacts: Contacts

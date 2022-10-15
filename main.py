@@ -1,5 +1,8 @@
 from fastapi import FastAPI
 
+from configuration import app_logger
+import repositories
+
 app = FastAPI()
 
 """
@@ -14,6 +17,7 @@ async def abc():
     return {"abc": "123"}
 
 
+app_logger.debug("APP START")
 # TODO add README
 # TODO add LICENCE
 

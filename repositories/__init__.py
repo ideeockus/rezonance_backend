@@ -1,11 +1,9 @@
-import logging
-
 import psycopg
 
-from configuration import app_logger
+from configuration import app_logger, ServiceConfig
 
 conn = psycopg.connect(
-    "dbname=rezonance_local_db user=rezonance_local_user",
+    ServiceConfig.POSTGRES_DB_URL,
     # row_factory=namedtuple_row
 )
 
@@ -15,7 +13,7 @@ def init_accounts_db():
         cur.execute(
             """
             CREATE TABLE IF NOT EXISTS accounts (
-            id INT PRIMARY KEY,
+            id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
             username VARCHAR UNIQUE,
             user_data JSONB,
             contacts JSONB
@@ -29,7 +27,6 @@ def init_accounts_db():
 def init_databases():
     init_accounts_db()
 
-
-app_logger.info("Initialising databases")
-init_databases()
 # logging.info("Initialising database")
+
+# TODO add psycopg ConnectionPool instead of making connection for each repository

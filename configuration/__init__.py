@@ -4,7 +4,13 @@ import sys
 
 
 class ServiceConfig:
-    postgres_db_url = os.getenv("POSTGRES_DB_URL")
+    """Service configurations from ENV"""
+
+    DB_NAME = os.getenv("DB_NAME")
+    DB_USER = os.getenv("DB_USER")
+
+    POSTGRES_DB_URL = f"postgres://{DB_USER}@localhost/{DB_NAME}"
+    # postgres_db_url = os.getenv("POSTGRES_DB_URL")
 
 
 app_logging_formatter = logging.Formatter(

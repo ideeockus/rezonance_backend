@@ -3,8 +3,11 @@ from fastapi import FastAPI
 
 from configuration import app_logger
 import repositories
+from services import auth_service
 
 app = FastAPI()
+
+app.include_router(auth_service.router)
 
 """
 representation layer
@@ -14,7 +17,7 @@ storage layer
 
 
 @app.get("/")
-async def abc():
+async def root():
     return {"abc": "123"}
 
 

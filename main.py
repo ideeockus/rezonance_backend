@@ -3,11 +3,11 @@ from fastapi import FastAPI
 
 from configuration import app_logger
 import repositories
-from services import auth_service
+from services import accounts_service
 
 app = FastAPI()
 
-app.include_router(auth_service.router)
+app.include_router(accounts_service.router)
 
 """
 representation layer

@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from models.account import Account, UserData, Contacts
-from repositories.accounts import create_account, get_account_by_username, get_account_by_id, delete_account_by_id
+from repositories.accounts_repository import create_account, get_account_by_username, get_account_by_id, delete_account_by_id
 
 
 class TestAccountsRepository:

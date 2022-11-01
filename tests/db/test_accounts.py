@@ -7,10 +7,12 @@ from repositories.accounts_repository import create_account, get_account_by_user
 class TestAccountsRepository:
     def test_accounts_db(self):
         account_username: str = "test_account"
+        account_password: str = "test_pass"
 
         # test creation
         account_id = create_account(
             account_username,
+            account_password,
             UserData.mock(),
             Contacts.mock()
         )

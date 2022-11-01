@@ -15,6 +15,7 @@ def init_accounts_db():
             CREATE TABLE IF NOT EXISTS accounts (
             id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
             username VARCHAR UNIQUE,
+            password_hash VARCHAR,
             user_data JSONB,
             contacts JSONB
             );

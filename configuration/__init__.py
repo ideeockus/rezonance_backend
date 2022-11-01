@@ -11,6 +11,8 @@ class ServiceConfig:
 
     POSTGRES_DB_URL = f"postgres://{DB_USER}@localhost/{DB_NAME}"
     # postgres_db_url = os.getenv("POSTGRES_DB_URL")
+    SECRET_KEY = os.getenv("SECRET_KEY")
+    JWT_ALGORITHM = "HS256"
 
 
 app_logging_formatter = logging.Formatter(

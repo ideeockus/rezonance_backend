@@ -50,5 +50,6 @@ class Contacts(BaseModel):
 class Account(BaseModel):
     id: UUID
     username: str
+    password_hash: str
     user_data: UserData
     contacts: Contacts

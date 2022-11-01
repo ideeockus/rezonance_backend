@@ -3,6 +3,7 @@ from uuid import UUID
 
 import psycopg
 from psycopg.rows import class_row
+from passlib.context import CryptContext
 
 from configuration import ServiceConfig, app_logger
 from models.account import Account, UserData, Contacts
@@ -15,22 +16,25 @@ conn = psycopg.connect(
 # aconn = psycopg.AsyncConnection.connect(ServiceConfig.POSTGRES_DB_URL)
 # async with conn.cursor() as cur:
 #     cur.execute(...)
+pwd_context = CryptContext(schemes=["sha256_crypt", "des_crypt"])
 
 
-def create_account(username: str, user_data: UserData, contacts: Contacts) -> Optional[UUID]:
+def create_account(username: str, password: str, user_data: UserData, contacts: Contacts) -> Optional[UUID]:
     """create an account and return id"""
     app_logger.debug(f"creating account {username}")
     try:
+        password_hash = pwd_context.hash(password)
         # # # should it raise exception or return None ?!
         with conn.cursor() as cur:
             cur.execute(
                 """
-                INSERT INTO accounts (username, user_data, contacts)
-                VALUES (%(username)s, %(user_data)s, %(contacts)s)
+                INSERT INTO accounts (username, password_hash, user_data, contacts)
+                VALUES (%(username)s, %(password_hash)s, %(user_data)s, %(contacts)s)
                 RETURNING id;
                 """,
                 {
                     "username": username,
+                    "password_hash": password_hash,
                     "user_data": user_data.json(),
                     "contacts": contacts.json(),
                 },
@@ -40,11 +44,50 @@ def create_account(username: str, user_data: UserData, contacts: Contacts) -> Op
             conn.commit()
             return account_id
             # # #
-    except psycopg.errors.Error:
+    except psycopg.errors.Error as e:
+        app_logger.exception(f"error: {e}")
         conn.rollback()  # need to rollback in case of exception
         return None
 
 # TODO table to safely remove accounts
+
+
+def get_account_by_credentials(username: str, password: str) -> Optional[Account]:
+    app_logger.debug(f"authenticationg account {username}")
+
+    password_hash = pwd_context.hash(password)
+
+    with conn.cursor(row_factory=class_row(Account)) as cur:
+        cur.execute(
+            "SELECT * FROM accounts WHERE "
+            "username = %(username)s AND password_hash = %(password_hash)s;",
+            {"username": username, "password_hash": password_hash},
+        )
+        account = cur.fetchone()
+
+        if not account:
+            # raise KeyError(f"User {username} not found")
+            return None
+
+        return account
+
+    # with conn.cursor() as cur:
+    #     cur.execute(
+    #         """
+    #         SELECT * FROM accounts
+    #         WHERE username = %(username)s;
+    #         """,
+    #         {
+    #             "username": username
+    #         },
+    #     )
+    #     password_hash_from_db = cur.fetchone()[0]
+    #
+    #     auth_is_ok = pwd_context.verify(password, password_hash_from_db)
+    #     if auth_is_ok:
+    #         return jwt
+    #
+    #     return None
 
 
 def get_account_by_username(username: str) -> Optional[Account]:

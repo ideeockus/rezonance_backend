@@ -16,7 +16,7 @@ conn = psycopg.connect(
 # aconn = psycopg.AsyncConnection.connect(ServiceConfig.POSTGRES_DB_URL)
 # async with conn.cursor() as cur:
 #     cur.execute(...)
-pwd_context = CryptContext(schemes=["sha256_crypt", "des_crypt"])
+pwd_context = CryptContext(schemes=["bcrypt"])
 
 
 def create_account(username: str, password: str, user_data: UserData, contacts: Contacts) -> Optional[UUID]:
@@ -55,13 +55,13 @@ def create_account(username: str, password: str, user_data: UserData, contacts: 
 def get_account_by_credentials(username: str, password: str) -> Optional[Account]:
     app_logger.debug(f"authenticationg account {username}")
 
-    password_hash = pwd_context.hash(password)
+    # password_hash = pwd_context.hash(password)
 
     with conn.cursor(row_factory=class_row(Account)) as cur:
         cur.execute(
             "SELECT * FROM accounts WHERE "
-            "username = %(username)s AND password_hash = %(password_hash)s;",
-            {"username": username, "password_hash": password_hash},
+            "username = %(username)s;",
+            {"username": username},
         )
         account = cur.fetchone()
 
@@ -69,7 +69,11 @@ def get_account_by_credentials(username: str, password: str) -> Optional[Account
             # raise KeyError(f"User {username} not found")
             return None
 
-        return account
+        # checking password
+        if pwd_context.verify(password, account.password_hash):
+            return account
+
+        return None
 
     # with conn.cursor() as cur:
     #     cur.execute(

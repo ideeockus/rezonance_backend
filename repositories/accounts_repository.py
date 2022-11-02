@@ -44,6 +44,9 @@ def create_account(username: str, password: str, user_data: UserData, contacts: 
             conn.commit()
             return account_id
             # # #
+    except psycopg.errors.UniqueViolation:
+        app_logger.error(f"Username {username} exists")
+        return None
     except psycopg.errors.Error as e:
         app_logger.exception(f"error: {e}")
         conn.rollback()  # need to rollback in case of exception

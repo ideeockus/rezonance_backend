@@ -25,8 +25,29 @@ def init_accounts_db():
         conn.commit()
 
 
+def init_events_db():
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            CREATE TABLE IF NOT EXISTS events (
+            id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+            name VARCHAR,
+            description VARCHAR,
+            date TIMESTAMP,
+            participants UUID REFERENCES accounts (id),
+            type VARCHAR,
+            location JSONB
+            );
+            """
+        )
+        # FOREIGN KEY (participants) REFERENCES accounts (id)
+        app_logger.debug("events db initialised")
+        conn.commit()
+
+
 def init_databases():
     init_accounts_db()
+    init_events_db()
 
 # logging.info("Initialising database")
 

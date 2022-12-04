@@ -57,6 +57,16 @@ async def get_me(account: Account = Depends(get_account_by_jwt_token)):
     )
 
 
+@router.get("/get_user")
+async def get_me(username: str, account: Account = Depends(get_account_by_jwt_token)):
+    user_account = accounts_repository.get_account_by_username(username)
+    return AccountDTO(
+        id=user_account.id,
+        username=user_account.username,
+        user_data=user_account.user_data,
+    )
+
+
 @router.get("/abc")
 async def abc2():
     return {"abc": "123"}

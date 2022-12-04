@@ -58,7 +58,7 @@ async def get_me(account: Account = Depends(get_account_by_jwt_token)):
 
 
 @router.get("/get_user")
-async def get_me(username: str, account: Account = Depends(get_account_by_jwt_token)):
+async def get_user(username: str, account: Account = Depends(get_account_by_jwt_token)):
     user_account = accounts_repository.get_account_by_username(username)
     return AccountDTO(
         id=user_account.id,

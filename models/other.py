@@ -2,4 +2,5 @@ from pydantic import BaseModel
 
 
 class Location(BaseModel):
-    pass
+    latitude: str
+    longitude: str

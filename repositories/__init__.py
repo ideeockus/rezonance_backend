@@ -34,7 +34,7 @@ def init_events_db():
             name VARCHAR,
             description VARCHAR,
             date TIMESTAMP,
-            participants UUID REFERENCES accounts (id),
+            owner_id UUID REFERENCES accounts (id),
             type VARCHAR,
             location JSONB
             );
@@ -42,6 +42,22 @@ def init_events_db():
         )
         # FOREIGN KEY (participants) REFERENCES accounts (id)
         app_logger.debug("events db initialised")
+        conn.commit()
+
+
+def init_user_event_m2m_relationship_db():
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            CREATE TABLE IF NOT EXISTS users_events_relationship (
+            user_id UUID REFERENCES accounts (id),
+            event_id UUID REFERENCES events (id),
+            PRIMARY KEY (user_id, event_id)
+            );
+            """
+        )
+        # FOREIGN KEY (participants) REFERENCES accounts (id)
+        app_logger.debug("users_events_relationship db initialised")
         conn.commit()
 
 

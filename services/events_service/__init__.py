@@ -1,7 +1,12 @@
+from datetime import datetime
+from uuid import UUID
+
 from fastapi import APIRouter, HTTPException, status, Depends
 
-from models.account import UserData, Contacts, Account
-from models.dto.api.account import AccountDTO
+from models.account import Account
+from models.event import EventType
+from models.other import Location
+from repositories import events_repository
 from services.accounts_service import get_account_by_jwt_token
 
 router = APIRouter(
@@ -11,35 +16,28 @@ router = APIRouter(
 
 
 @router.post("/create_event")
-async def create_event(account: Account = Depends(get_account_by_jwt_token), event):
-    account_id = accounts_repository.create_account(username, password, user_data, contacts)
-    if account_id is None:
+async def create_event(event_name: str, description: str, date: datetime, event_type: EventType, location: Location,
+                       account: Account = Depends(get_account_by_jwt_token)):
+    event_id = events_repository.create_event(event_name, description, date, account.id, event_type, location)
+    if event_id is None:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
-        # return None
 
-    auth_token = create_jwt_token(username)
+    # add current user to participants
 
-    return {"auth_token": auth_token}
+    return {"event_id": event_id}
 
 
-@router.get("/me")
-async def get_me(account: Account = Depends(get_account_by_jwt_token)):
-    return AccountDTO(
-        id=account.id,
-        username=account.username,
-        user_data=account.user_data,
-    )
+@router.get("/get_event")
+async def get_event(event_id: UUID,
+                    account: Account = Depends(get_account_by_jwt_token)):
+    if account is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
-# @router.get("/get_event")
-# async def get_event(username: str, password: str):
-#     account = accounts_repository.get_account_by_credentials(username, password)
-#     if account is None:
-#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-#         # return None
-#
-#     auth_token = create_jwt_token(username)
-#
-#     return {"auth_token": auth_token}
+    event = events_repository.get_event_by_id(event_id)
+    if event is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    return {"event": event}
 
 
 

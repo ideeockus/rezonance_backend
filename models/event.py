@@ -9,9 +9,9 @@ from models.other import Location
 
 
 class EventType(Enum):
-    P2P = auto()
-    OFFLINE_MEETUP = auto()
-    ONLINE = auto()
+    P2P = "P2P"
+    OFFLINE_MEETUP = "OFFLINE_MEETUP"
+    ONLINE = "ONLINE"
 
 
 class Event(BaseModel):
@@ -19,6 +19,7 @@ class Event(BaseModel):
     name: str
     description: str
     date: datetime
-    participants: List[UUID]  # accounts ids
+    owner_id: UUID
+    # participants: List[UUID]  # accounts ids
     type: EventType
     location: Location

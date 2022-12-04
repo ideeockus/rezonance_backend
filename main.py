@@ -3,11 +3,12 @@ from fastapi import FastAPI, Request
 
 from configuration import app_logger
 import repositories
-from services import accounts_service
+from services import accounts_service, events_service
 
 app = FastAPI()
 
 app.include_router(accounts_service.router)
+app.include_router(events_service.router)
 
 """
 representation layer
